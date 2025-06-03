@@ -1,0 +1,7 @@
+#Sample	Gene	SolutionID	Major	Minor	Copy	Allele	Location	Type	Coverage	Effect	dbSNP	Code	Status
+#Solution 1: *1.001, *4, *4.021
+NA10860	CYP2D6	1	*1/*4+*4.021	1.001;4;4.021	0	1.001
+NA10860	CYP2D6	1	*1/*4+*4.021	1.001;4;4.021	1	4	42522612	C>G	15	S486T	rs1135840
+#Solution 2: *4, *4, *139.001
+NA10860	CYP2D6	2	*4+*4/*139	4;139.001;4	0	4	42522612	C>G	15	S486T	rs1135840
+NA10860	CYP2D6	2	*4+*4/*139	4;139.001;4	0	4	42524946	C>T	32	splicing defect/169frameshift	rs3892097

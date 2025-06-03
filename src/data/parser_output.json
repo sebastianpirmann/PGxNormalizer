@@ -1,0 +1,38 @@
+[
+    {
+        "sample_id": "string",            // REQUIRED: Unique patient/sample identifier
+        "gene": "string",                 // REQUIRED: The gene symbol (e.g., "CYP2D6", "CYP2C19")
+        "tool_name": "string",            // REQUIRED: The name of the genotyping tool (e.g., "ALDY", "Stargazer")
+        "reference_genome": "string",     // REQUIRED: The genomic reference assembly (e.g., "GRCh37", "GRCh38")
+        "input_file": "string",           // OPTIONAL: The name/path of the original input file
+        "raw_tool_output": {              // REQUIRED: A dictionary encapsulating all tool-specific raw details
+            "diplotype_string": "string", // REQUIRED: The primary diplotype reported by the tool (e.g., "CYP2D6*1/*4", "CYP2D6*1/*1x2")
+            "haplotype1_raw": "string",   // OPTIONAL: Raw string for the first allele/haplotype (e.g., "*1", "CYP2D6*1")
+            "haplotype2_raw": "string",   // OPTIONAL: Raw string for the second allele/haplotype (e.g., "*4", "CYP2D6*4")
+            "copy_number_raw": "numeric", // OPTIONAL: Any gene/segmental copy number reported by the tool (e.g., 2, 3)
+            "functional_status_raw": "string", // OPTIONAL: Any functional prediction directly from the tool (e.g., "Normal Function")
+            "phenotype_prediction_raw": "string", // OPTIONAL: Any phenotype prediction directly from the tool (e.g., "Normal Metabolizer", "UM")
+            "confidence_score_raw": "numeric", // OPTIONAL: Any quality or confidence score for the call (e.g., 0.95)
+            "comments_raw": "string",     // OPTIONAL: Any general comments or notes from the tool's output
+            "structural_variants_raw": [  // OPTIONAL: List of raw structural variants detected (e.g., gene deletions, duplications)
+                {"type": "string", "description": "string", "location": "string", "tool_specific_id": "string"}
+            ],
+            "variants_reported": [        // OPTIONAL: List of individual variant (SNP/indel) details from the tool
+                {
+                    "rsid": "string",            // REQUIRED if available
+                    "location": "string",        // REQUIRED if available (e.g., "chr22:42522612" or just "42522612")
+                    "ref_allele": "string",      // REQUIRED if available
+                    "alt_allele": "string",      // REQUIRED if available
+                    "genotype": "string",        // OPTIONAL (e.g., "A/G", "G/G")
+                    "zygosity": "string",        // OPTIONAL (e.g., "homozygous", "heterozygous")
+                    "quality_score": "numeric",  // OPTIONAL (e.g., Phred score, coverage)
+                    "allele_assignment": "string", // OPTIONAL: Which raw haplotype this variant belongs to (e.g., "haplotype1", "haplotype2", "unassigned")
+                    "tool_specific_flags": "string", // OPTIONAL: Any flags or specific details for this variant from the tool
+                }
+            ],
+            // ... any other unique, raw fields from that specific tool's output that might be useful
+            // These ensure no information from the raw output is lost if needed for later analysis/debugging.
+        }
+    },
+    // ... potentially more dictionaries for other gene calls or samples ...
+]
