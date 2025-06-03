@@ -1,3 +1,4 @@
+import sys
 import pandas as pd
 import os
 import json
@@ -56,7 +57,7 @@ class AldyParser(BaseParser):
         # Clean the diplotype string to count distinct allele components
         # Example: CYP2D6*1/*4+*4.021 -> *1/*4+*4.021 -> 1, 4, 4.021 (3 copies)
         # Handle various common delimiters and remove gene prefixes
-        cleaned_diplotype = diplotype_string.replace('CYP2D6', '').replace('CYP2C9', '').replace('CYP2C19', '')
+        cleaned_diplotype = diplotype_string.replace('CYP2D6', '').replace('CYP2C9', '').replace('CYP2C19', '') # TODO: Implement general solution
         # Split by '/', '+', and filter out empty strings
         alleles_list = [a.strip() for a in re.split(r'[/\+]', cleaned_diplotype) if a.strip()]
         return len(alleles_list)
@@ -195,7 +196,15 @@ class AldyParser(BaseParser):
                         # Combine tool-specific flags into a single string for tool_specific_flags
                         tool_flags = []
                         if pd.notna(row.get('VariantStatus')): tool_flags.append(row['VariantStatus'])
+                        # NORMAL: variant is associated with the star-allele in the database and is found in the sample
+                        # NOVEL: gene-disrupting (core) variant is NOT associated with the star-allele in the database, but is found in the sample (this indicates that Aldy found a novel major star-allele)
+                        # EXTRA: neutral variant is NOT associated with the star-allele in the database, but is found in the sample (this indicates that Aldy found a novel minor star-allele)
+                        # MISSING: neutral variant is associated with the star-allele in the database, but is NOT found in the sample (this also indicates that Aldy found a novel minor star-allele)
+                        
                         if pd.notna(row.get('VariantFunctionalityRaw')): tool_flags.append(f"FUNC:{row['VariantFunctionalityRaw']}")
+                        # DISRUPTING for gene-disrupting (core, functional) variants, and
+                        # NEUTRAL for neutral (silent) variants
+                        
                         if pd.notna(row.get('KarolinskaCode')): tool_flags.append(f"CODE:{row['KarolinskaCode']}")
                         tool_specific_flags_str = "|".join(tool_flags) if tool_flags else None
                         
@@ -258,8 +267,6 @@ NA10860	CYP2D6	1	CYP2D6*1/*4+*4.021	1.001;4;4.021	2	*4.021	42522612	A>T	18	DISRU
 NA10860	CYP2D6	2	CYP2D6*4/*4+*139.001	4;139.001;4	0	*4	42522612	C>G	15	S486T	rs1135840	C3	NORMAL
 NA10860	CYP2D6	2	CYP2D6*4/*4+*139.001	4;139.001;4	1	*4	42524946	C>T	32	splicing defect/169frameshift	rs3892097	C4	NORMAL
 NA10860	CYP2D6	2	CYP2D6*4/*4+*139.001	4;139.001;4	2	*139.001	42525000	G>A	25	NEUTRAL	rs9876543	C5	EXTRA
-SampleB	CYP2C19	1	CYP2C19*1/*17	1;17	0	*1				
-SampleB	CYP2C19	1	CYP2C19*1/*17	1;17	1	*17	12345678	G>C	20	UPSTREAM	rs112233	C6	NORMAL
 """
     dummy_file_path = "src/parsers/test_aldy_output.tsv"
     with open(dummy_file_path, "w") as f:
