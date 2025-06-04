@@ -3,23 +3,16 @@
     
     // Use a pre-built Python image
     "image": "mcr.microsoft.com/devcontainers/python:3.10", // Using Python 3.10 base image
-    // Or specify a Dockerfile: "build": { "dockerfile": "Dockerfile" },
+    // Or specify a Dockerfile: "build": { "dockerfile": "Dockerfile" }, -> TODO
 
     "features": {
-        // Optional: Install common OS tools if needed
-        // "ghcr.io/devcontainers/features/common-utils:2": {
-        //     "installZsh": true,
-        //     "installOhMyZsh": true,
-        //     "upgradePackages": true
-        // }
+        // Install common OS tools if needed
+         "ghcr.io/devcontainers/features/common-utils:2": {
+             "installZsh": true,
+             "installOhMyZsh": true,
+             "upgradePackages": true
+         }
     },
-
-    // Features to add to the devcontainer. More info: https://containers.dev/features.
-    // "features": {
-    //     "ghcr.io/devcontainers/features/docker-in-docker:2": {
-    //         "version": "latest"
-    //     }
-    // },
 
     // Configure tool-specific properties.
     "customizations": {
@@ -38,6 +31,6 @@
     // Use 'postCreateCommand' to run commands after the container is created.
     "postCreateCommand": "pip install --no-cache-dir -r requirements.txt"
 
-    // Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+    // Uncomment to connect as root instead
     // "remoteUser": "root"
 }

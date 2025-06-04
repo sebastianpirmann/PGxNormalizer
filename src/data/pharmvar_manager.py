@@ -16,10 +16,9 @@ class PharmVarManager:
         self.supported_genes: List[str] = list(self.pharmvar_db.get("genes", {}).keys()) # Adjusted for new JSON structure
         print(f"PharmVarManager initialized. Loaded allele definitions for {len(self.supported_genes)} genes.")
 
-    # --- Manually Curated Mappings for Functionality and Phenotype ---
-    # These are crucial and based on CPIC guidelines and PharmVar functional annotations.
-    # This is a simplified example; a full implementation would cover all known alleles
-    # and nuances, potentially loading from a separate configuration file for larger projects.
+    # Example of Manually Curated Mappings for Functionality and Phenotype
+    # These should be based on CPIC guidelines and PharmVar functional annotations.
+    # This is a simplified example with placeholders that should illustrate the structure
     _allele_functionality_map = {
         "CYP2D6": {
             "*1": "Normal Function", "*2": "Normal Function", "*10": "Decreased Function",
@@ -57,29 +56,29 @@ class PharmVarManager:
             "*1": "Normal Function", "*6": "Decreased Function", "*28": "Decreased Function",
             "UNKNOWN": "Unknown"
         },
-        "SLCO1B1": { # Note: SLCO1B1 function is more complex; simplified here
+        "SLCO1B1": {
             "*1A": "Normal Function", "*5": "Decreased Function", "*15": "Decreased Function",
             "UNKNOWN": "Unknown"
         },
-        "CYP3A4": { # Most common functional variants
+        "CYP3A4": {
             "*1": "Normal Function", "*22": "Decreased Function",
             "UNKNOWN": "Unknown"
         },
-        "VKORC1": { # Not a metabolizer, but relevant for dosing. Assuming variant-level mapping if no star allele.
-            "*1": "Normal Function", # Assuming *1 exists or represents WT
-            "rs9923231": "Decreased Function", # Common variant for VKORC1
+        "VKORC1": {
+            "*1": "Normal Function",
+            "rs9923231": "Decreased Function",
             "UNKNOWN": "Unknown"
         },
-        "F5": { # Not a metabolizer gene, no star alleles. Need to handle as variant.
-            "*1": "Normal Function", # Assuming *1 exists or represents WT
-            "rs6025": "Increased Function", # Factor V Leiden
+        "F5": {
+            "*1": "Normal Function",
+            "rs6025": "Increased Function",
             "UNKNOWN": "Unknown"
         },
-        "CYP1A2": { # Added for your example
+        "CYP1A2": {
             "*1": "Normal Function", "*1F": "Increased Function", "*1C": "Decreased Function",
             "UNKNOWN": "Unknown"
         }
-        # Add other genes and their common alleles as needed
+
     }
 
     # Standardized Phenotype Abbreviations (CPIC-like)
@@ -90,8 +89,8 @@ class PharmVarManager:
         "No Function": "PM",
         "Unknown": "Unknown",
         "Uncertain Function": "Indeterminate",
-        # For non-metabolizer genes, you might use different terms for functionality
-        "Normal": "Normal", # Used for VKORC1, F5 if their function is just "Normal"
+
+        "Normal": "Normal",
         "Reduced": "Reduced",
         "Increased": "Increased",
         "Non-functional": "Non-functional",
@@ -115,7 +114,7 @@ class PharmVarManager:
 
     def get_gene_info(self, gene_name: str) -> Optional[Dict[str, Any]]:
         """Returns all PharmVar allele definition information for a given gene."""
-        # Adjusted for new JSON structure: access via "genes" key
+
         return self.pharmvar_db.get("genes", {}).get(gene_name)
 
     def get_normalized_allele(self, gene_name: str, raw_allele: str) -> Optional[str]:
@@ -127,7 +126,7 @@ class PharmVarManager:
         if not gene_name or not raw_allele:
             return "UNKNOWN" # Return "UNKNOWN" for invalid inputs
 
-        gene_data = self.pharmvar_db.get("genes", {}).get(gene_name) # Adjusted for new JSON structure
+        gene_data = self.pharmvar_db.get("genes", {}).get(gene_name)
         if not gene_data:
             return "UNKNOWN"
 
@@ -157,7 +156,7 @@ class PharmVarManager:
                 return normalized_form
         
         # 3. Handle specific non-star allele cases like rsIDs for VKORC1, F5 etc.
-        # If the raw_allele matches a known variant in our *functionality map*,
+        # If the raw_allele matches a known variant in the functionality map,
         # we treat it as a normalized allele for functionality lookup.
         if gene_name in self._allele_functionality_map and \
            raw_allele in self._allele_functionality_map[gene_name]:
@@ -183,7 +182,7 @@ class PharmVarManager:
             return functionality
         
         # Handle allele groups like *xN for duplications (e.g., *1x2, *2xN)
-        # This is a simplification; a robust solution might need a regex or more complex logic.
+        # This is a simplification; a robust solution will need a regex or more complex logic.
         if gene_name == "CYP2D6" and 'x' in normalized_allele:
             # Check for patterns like *1X2, *2XN, *1x3 etc.
             if 'x' in normalized_allele.lower():
@@ -203,9 +202,7 @@ class PharmVarManager:
         return self._phenotype_map.get(functionality, "Unknown")
 
 
-# Example usage (for testing this module directly)
 if __name__ == "__main__":
-    # Ensure src/data/pharmvar_processed.json exists by running load_pharmvar.py first
     
     print("--- Testing PharmVarManager ---")
     try:
@@ -227,17 +224,17 @@ if __name__ == "__main__":
         # Test functionality and phenotype mapping
         norm_allele_1 = manager.get_normalized_allele(gene, 'CYP2D6*1')
         func_1 = manager.get_allele_functionality(gene, norm_allele_1)
-        phen_1 = manager.get_standard_phenotype(func_1) # Removed gene param from get_standard_phenotype call
+        phen_1 = manager.get_standard_phenotype(func_1)
         print(f"Allele {norm_allele_1}: Functionality '{func_1}', Phenotype '{phen_1}'")
 
         norm_allele_4 = manager.get_normalized_allele(gene, '*4')
         func_4 = manager.get_allele_functionality(gene, norm_allele_4)
-        phen_4 = manager.get_standard_phenotype(func_4) # Removed gene param
+        phen_4 = manager.get_standard_phenotype(func_4)
         print(f"Allele {norm_allele_4}: Functionality '{func_4}', Phenotype '{phen_4}'")
 
-        norm_allele_dup = manager.get_normalized_allele(gene, 'CYP2D6*1X2') # Example for duplication
+        norm_allele_dup = manager.get_normalized_allele(gene, 'CYP2D6*1X2')
         func_dup = manager.get_allele_functionality(gene, norm_allele_dup)
-        phen_dup = manager.get_standard_phenotype(func_dup) # Removed gene param
+        phen_dup = manager.get_standard_phenotype(func_dup)
         print(f"Allele {norm_allele_dup}: Functionality '{func_dup}', Phenotype '{phen_dup}'")
 
 
@@ -247,7 +244,7 @@ if __name__ == "__main__":
         print(f"Normalized 'TPMT*2': {manager.get_normalized_allele(gene, 'TPMT*2')}")
         func_tpmt2 = manager.get_allele_functionality(gene, manager.get_normalized_allele(gene, 'TPMT*2'))
         print(f"Functionality of 'TPMT*2': {func_tpmt2}")
-        print(f"Standard phenotype of 'No Function' for TPMT: {manager.get_standard_phenotype('No Function')}") # Removed gene param
+        print(f"Standard phenotype of 'No Function' for TPMT: {manager.get_standard_phenotype('No Function')}")
 
         # Test VKORC1 (example for non-star allele gene)
         print("\n--- Testing VKORC1 ---")
@@ -255,7 +252,7 @@ if __name__ == "__main__":
         print(f"Normalized 'rs9923231': {manager.get_normalized_allele(gene, 'rs9923231')}")
         func_vkorc1 = manager.get_allele_functionality(gene, manager.get_normalized_allele(gene, 'rs9923231'))
         print(f"Functionality of 'rs9923231': {func_vkorc1}")
-        print(f"Standard phenotype of 'Decreased Function' for VKORC1: {manager.get_standard_phenotype('Decreased Function')}") # Removed gene param
+        print(f"Standard phenotype of 'Decreased Function' for VKORC1: {manager.get_standard_phenotype('Decreased Function')}")
 
         # Test unknown gene
         print("\n--- Testing Unknown Gene ---")

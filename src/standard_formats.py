@@ -2,7 +2,7 @@
 
 from typing import List, Dict, Any, Optional, Union, TypedDict
 
-# --- Helper TypedDicts for nested structures ---
+#  Helper TypedDicts for nested structures 
 
 class VariantReported(TypedDict, total=False):
     """
@@ -53,15 +53,15 @@ class RawToolOutput(TypedDict, total=False):
     By setting `total=False`, all fields within this TypedDict are optional by default.
     However, the `diplotype_string` is considered REQUIRED by the parser to be present.
     """
-    # --- Core Interpretation from the Tool (Highly recommended for parsers to provide) ---
+    # Core Interpretation from the Tool
     diplotype_string: str # REQUIRED: The primary diplotype call string as reported by the tool
                           # (e.g., "CYP2D6*1/*4", "*1x2/*4"). This is the most fundamental output.
 
-    # --- Haplotype-level Raw Data (if tool distinguishes them) ---
+    # Haplotype-level Raw Data (if tool distinguishes them) 
     haplotype1_raw: Optional[str] # The raw string for the first inferred haplotype
     haplotype2_raw: Optional[str] # The raw string for the second inferred haplotype
 
-    # --- Other Summary-level Raw Data from the Tool ---
+    # Other Summary-level Raw Data from the Tool 
     copy_number_raw: Optional[Union[int, float]] # Any reported gene/segmental copy number from the tool
     functional_status_raw: Optional[str]        # Tool's direct functional prediction (e.g., "Normal Function", "Decreased Function")
     phenotype_prediction_raw: Optional[str]     # Tool's direct phenotype prediction (e.g., "Normal Metabolizer", "UM")
@@ -69,11 +69,11 @@ class RawToolOutput(TypedDict, total=False):
     comments_raw: Optional[str]                 # General comments, notes, or supplementary text from the tool's output
                                                 # (e.g., the "#Solution X:" description from ALDY)
 
-    # --- Detailed Variant and Structural Information ---
+    # Detailed Variant and Structural Information 
     variants_reported: List[VariantReported]     # A list of individual variant calls (SNPs/indels) contributing to the diplotype
     structural_variants_raw: List[StructuralVariantRaw] # A list of structural variants reported by the tool
 
-    # --- Tool-Specific Raw Data (Add as needed for each new parser) ---
+    # Tool-Specific Raw Data (Add as needed for each new parser) 
     # These fields are crucial for capturing unique details from specific tools.
     # Example fields for ALDY parser (as discussed previously):
     aldy_solution_id: Optional[str]                 # ALDY's internal solution identifier
@@ -92,14 +92,14 @@ class StandardizedGeneCall(TypedDict):
     This TypedDict serves as the primary "contract" between all parsers and the PGx Normalizer.
     All fields in this top-level TypedDict are REQUIRED unless specified otherwise.
     """
-    # --- Core Identifiers (REQUIRED for every StandardizedGeneCall) ---
+    # Core Identifiers (REQUIRED for every StandardizedGeneCall) 
     sample_id: str             # Unique identifier for the patient or sample (e.g., "NA10860")
     gene: str                  # The pharmacogene symbol (e.g., "CYP2D6", "CYP2C19", "TPMT")
     tool_name: str             # The name of the genotyping tool that generated this call (e.g., "ALDY", "Stargazer", "PharmCAT")
     reference_genome: str      # The genomic reference assembly used by the tool for this call (e.g., "GRCh37", "GRCh38")
 
-    # --- Traceability and Raw Data (Important for Normalizer) ---
-    input_file: Optional[str]  # The base name or path of the original input file processed by the parser (e.g., "aldy_output.tsv")
+    # Traceability and Raw Data (Important for Normalizer) 
+    input_file: Optional[str]  # The base name or path of the original input file processed by the parser
 
     # This crucial nested dictionary holds all the raw, tool-specific details.
     # It must always be present, although its contents are flexible.
